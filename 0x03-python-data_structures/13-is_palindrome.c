@@ -1,81 +1,72 @@
 #include "lists.h"
 
 /**
- * is_palindrome - check if it palindrome or not
- * @head: the pointer to the list
- * Return: 1 if palindrome, 0 otherwise
-*/
+ * reverse_listint - reverses a linked list
+ * @head: pointer to the first node in the list
+ *
+ * Return: pointer to the first node in the new list
+ */
+void reverse_listint(listint_t **head)
+{
+	listint_t *prev = NULL;
+	listint_t *current = *head;
+	listint_t *next = NULL;
 
+	while (current)
+	{
+		next = current->next;
+		current->next = prev;
+		prev = current;
+		current = next;
+	}
+
+	*head = prev;
+}
+
+/**
+ * is_palindrome - checks if a linked list is a palindrome
+ * @head: double pointer to the linked list
+ *
+ * Return: 1 if it is, 0 if not
+ */
 int is_palindrome(listint_t **head)
 {
-	if (!*head || !(**head).next)
+	listint_t *slow = *head, *fast = *head, *temp = *head, *dup = NULL;
+
+	if (*head == NULL || (*head)->next == NULL)
 		return (1);
-	listint_t *first;
-	int n, re;
 
-	first = *head, n = first->n;
-	while (first->next->next)
+	while (1)
 	{
-		first = first->next;
-	}
-	if ((first->next)->n != n)
-		return (0);
-	free_listint(first->next);
-	first->next = NULL;
-	first = (*head)->next;
-	re = is_palindrome(&first);
-	if (re == 0)
-		return (0);
-	add_nodeint_end(head, n);
-	return (1);
-}
-
-
-/**
- * free_listint - frees a listint_t list
- * @head: pointer to list to be freed
- * Return: void
- */
-void free_listint(listint_t *head)
-{
-	listint_t *current;
-
-	while (head != NULL)
-	{
-		current = head;
-		head = head->next;
-		free(current);
-	}
-}
-
-/**
- * add_nodeint_end - adds a new node at the end of a listint_t list
- * @head: pointer to pointer of first node of listint_t list
- * @n: integer to be included in new node
- * Return: address of the new element or NULL if it fails
- */
-listint_t *add_nodeint_end(listint_t **head, const int n)
-{
-	listint_t *new;
-	listint_t *current;
-
-	current = *head;
-
-	new = malloc(sizeof(listint_t));
-	if (new == NULL)
-		return (NULL);
-
-	new->n = n;
-	new->next = NULL;
-
-	if (*head == NULL)
-		*head = new;
-	else
-	{
-		while (current->next != NULL)
-			current = current->next;
-		current->next = new;
+		fast = fast->next->next;
+		if (!fast)
+		{
+			dup = slow->next;
+			break;
+		}
+		if (!fast->next)
+		{
+			dup = slow->next->next;
+			break;
+		}
+		slow = slow->next;
 	}
 
-	return (new);
+	reverse_listint(&dup);
+
+	while (dup && temp)
+	{
+		if (temp->n == dup->n)
+		{
+			dup = dup->next;
+			temp = temp->next;
+		}
+		else
+			return (0);
+	}
+
+	if (!dup)
+		return (1);
+
+	return (0);
 }
